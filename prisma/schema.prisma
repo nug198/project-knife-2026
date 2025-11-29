@@ -1,0 +1,137 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+  // Jangan gunakan output manual, biarkan Prisma handle
+}
+
+datasource db {
+  provider = "postgresql"
+  // URL dihandle oleh prisma.config.ts
+}
+
+model users {
+  id_user     Int       @id @default(autoincrement())
+  username    String    @unique
+  password    String
+  nama        String
+  email       String
+  avatar      String?   @default("/images/avatars/avatar1.jpg")
+  role        String    @default("admin")
+  last_login  DateTime? 
+  created_at  DateTime? @default(now())
+  updated_at  DateTime? @updatedAt
+  artikel     artikel[]
+
+  @@map("users") // Tambahkan mapping ke table name
+}
+
+model kategori {
+  id_kategori   Int       @id @default(autoincrement())
+  nama_kategori String
+  slug          String?   @unique
+  deskripsi     String?
+  created_at    DateTime? @default(now())
+  updated_at    DateTime?
+  produk        produk[]
+
+  @@map("kategori")
+}
+
+model maker {
+  id_maker   Int       @id @default(autoincrement())
+  nama_maker String
+  profil     String?
+  lokasi     String?
+  kontak     String?
+  foto_url   String?
+  created_at DateTime? @default(now())
+  updated_at DateTime?
+  produk     produk[]
+
+  @@map("maker")
+}
+
+model produk {
+  id_produk          Int              @id @default(autoincrement())
+  nama_produk        String
+  slug               String?          @unique
+  harga              Decimal?         @db.Decimal(10,2)
+  id_kategori        Int?
+  id_maker           Int?
+  deskripsi_singkat  String?
+  deskripsi_lengkap  String?
+  bahan_bilah        String?
+  bahan_gagang       String?
+  bahan_sarung       String?
+  panjang_bilah      Decimal?         @db.Decimal(5,2)
+  lebar_bilah        Decimal?         @db.Decimal(5,2)
+  tebal_bilah        Decimal?         @db.Decimal(3,2)
+  berat              Decimal?         @db.Decimal(6,2)
+  video_demo         String?
+  created_at         DateTime?        @default(now())
+  updated_at         DateTime?        @default(now())
+  status_tampil      Boolean?         @default(false)
+  rating             Decimal?         @db.Decimal(3,2)
+
+  kategori           kategori?        @relation(fields: [id_kategori], references: [id_kategori], onDelete: SetNull)
+  maker              maker?           @relation(fields: [id_maker], references: [id_maker], onDelete: SetNull)
+  gambar_produk      gambar_produk[]
+
+  @@map("produk")
+  @@index([id_maker])
+  @@index([id_kategori])
+}
+
+model gambar_produk {
+  id_gambar   Int       @id @default(autoincrement())
+  id_produk   Int?
+  gambar      String
+  url_gambar  String?   // Perbaiki typo: String?s -> String?
+  keterangan  String?
+  urutan      Int?      @default(1)
+
+  produk      produk?   @relation(fields: [id_produk], references: [id_produk], onDelete: Cascade)
+
+  @@map("gambar_produk")
+}
+
+model artikel {
+  id_artikel  Int       @id @default(autoincrement())
+  judul       String
+  slug        String?   @unique
+  isi         String?
+  gambar      String?
+  created_at  DateTime? @default(now())
+  updated_at  DateTime? @default(now())
+  id_user     Int?
+  url_sumber  String?
+
+  users       users?    @relation(fields: [id_user], references: [id_user], onDelete: SetNull)
+  
+  @@map("artikel")
+}
+
+model tema {
+  id_tema        Int       @id @default(autoincrement())
+  nama_tema      String?   @default("Default Green")
+  warna_primary  String?   @default("#1f513f")
+  warna_aksen    String?   @default("#3bbf79")
+  warna_teks     String?   @default("#ffffff")
+  logo_url       String?
+  aktif          Boolean?  @default(false)
+  updated_at     DateTime? @default(now())
+  
+  @@map("tema")
+}
+
+model menu {
+  id_menu    Int       @id @default(autoincrement())
+  nama_menu  String
+  slug       String    @unique
+  urutan     Int?      @default(0)
+  aktif      Boolean?  @default(true)
+  created_at DateTime? @default(now())
+  
+  @@map("menu")
+}

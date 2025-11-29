@@ -24,7 +24,7 @@ psql -U "$DB_USER" -d "$DB_NAME" <<'SQL'
 -- SCHEMA SETUP
 -- ============================================================
 
-CREATE TABLE IF NOT EXISTS "user" (
+CREATE TABLE IF NOT EXISTS "users" (
   id_user SERIAL PRIMARY KEY,
   username VARCHAR(100) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
@@ -41,7 +41,8 @@ CREATE TABLE IF NOT EXISTS kategori (
   slug VARCHAR(150) UNIQUE,
   deskripsi TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP
+  updated_at TIMESTAMP,
+  image_url VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS maker (
